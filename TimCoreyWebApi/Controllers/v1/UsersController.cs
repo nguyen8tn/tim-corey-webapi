@@ -2,10 +2,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ApiSecurity.Controllers;
+namespace TimCoreyWebApi.Controllers.v1;
 
-[Route("api/[controller]")]
+[Route("api/v{version:apiVersion}/[controller]")]
 [ApiController]
+[ApiVersion("1.0")]
 public class UsersController : ControllerBase
 {
     private readonly IConfiguration _config;
@@ -17,6 +18,7 @@ public class UsersController : ControllerBase
 
     // GET: api/<UsersController>
     [HttpGet]
+    [AllowAnonymous]
     public IEnumerable<string> Get()
     {
         return new string[] { "value1", "value2" };
