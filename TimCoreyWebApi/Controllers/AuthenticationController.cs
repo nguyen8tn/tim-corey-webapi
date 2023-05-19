@@ -20,9 +20,8 @@ public class AuthenticationController : ControllerBase
     }
 
     public record AuthenticationData(string? UserName, string? Password);
-    public record UserData(int UserId, string UserName, string Title, string EmployeeId);
+    public record UserData(int Id, string FirstName, string LastName, string UserName);
 
-    // api/Authentication/token
     [HttpPost("token")]
     [AllowAnonymous]
     public ActionResult<string> Authenticate([FromBody] AuthenticationData data)
@@ -34,7 +33,7 @@ public class AuthenticationController : ControllerBase
             return Unauthorized();
         }
 
-        var token = GenerateToken(user);
+        string token = GenerateToken(user);
 
         return Ok(token);
     }
@@ -48,17 +47,17 @@ public class AuthenticationController : ControllerBase
         var signingCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
 
         List<Claim> claims = new();
-        claims.Add(new(JwtRegisteredClaimNames.Sub, user.UserId.ToString()));
+        claims.Add(new(JwtRegisteredClaimNames.Sub, user.Id.ToString()));
         claims.Add(new(JwtRegisteredClaimNames.UniqueName, user.UserName));
-        claims.Add(new("title", user.Title));
-        claims.Add(new("employeeId", user.EmployeeId));
+        claims.Add(new(JwtRegisteredClaimNames.GivenName, user.FirstName));
+        claims.Add(new(JwtRegisteredClaimNames.FamilyName, user.LastName));
 
         var token = new JwtSecurityToken(
             _config.GetValue<string>("Authentication:Issuer"),
             _config.GetValue<string>("Authentication:Audience"),
             claims,
-            DateTime.UtcNow, // When this token becomes valid
-            DateTime.UtcNow.AddMinutes(1), // When the token will expire
+            DateTime.UtcNow,
+            DateTime.UtcNow.AddMinutes(1),
             signingCredentials);
 
         return new JwtSecurityTokenHandler().WriteToken(token);
@@ -66,17 +65,17 @@ public class AuthenticationController : ControllerBase
 
     private UserData? ValidateCredentials(AuthenticationData data)
     {
-        // THIS IS NOT PRODUCTION CODE - THIS IS ONLY A DEMO - DO NOT USE IN REAL LIFE
+        // THIS IS NOT PRODUCTION CODE - REPLACE THIS WITH A CALL TO YOUR AUTH SYSTEM
         if (CompareValues(data.UserName, "tcorey") &&
             CompareValues(data.Password, "Test123"))
         {
-            return new UserData(1, data.UserName!, "Business Owner", "E001");
+            return new UserData(1, "Tim", "Corey", data.UserName!);
         }
 
         if (CompareValues(data.UserName, "sstorm") &&
             CompareValues(data.Password, "Test123"))
         {
-            return new UserData(2, data.UserName!, "Head of Security", "E005");
+            return new UserData(2, "Sue", "Storm", data.UserName!);
         }
 
         return null;

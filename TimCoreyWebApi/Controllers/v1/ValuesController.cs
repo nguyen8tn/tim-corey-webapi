@@ -3,9 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace VersionedApi.Controllers.v1
 {
-    [Route("api/v{verion:apiVersion}/[controller]")]
+    //[Route("api/v{verion:apiVersion}/[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
-    [ApiVersion("1.0", Deprecated = true)]
+    //[ApiVersion("1.0", Deprecated = true)]
     [AllowAnonymous]
     public class ValuesController : ControllerBase
     {

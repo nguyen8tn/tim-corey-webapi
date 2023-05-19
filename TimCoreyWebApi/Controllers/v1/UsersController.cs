@@ -4,9 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace TimCoreyWebApi.Controllers.v1;
 
-[Route("api/v{version:apiVersion}/[controller]")]
+//[Route("api/v{version:apiVersion}/[controller]")]
 [ApiController]
-[ApiVersion("1.0")]
+[Route("api/[controller]")]
+//[ApiVersion("1.0")]
 public class UsersController : ControllerBase
 {
     private readonly IConfiguration _config;
@@ -19,6 +20,7 @@ public class UsersController : ControllerBase
     // GET: api/<UsersController>
     [HttpGet]
     [AllowAnonymous]
+    [ResponseCache(Duration = 10, Location = ResponseCacheLocation.Any, NoStore = false)]
     public IEnumerable<string> Get()
     {
         return new string[] { "value1", "value2" };
