@@ -4,57 +4,62 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using TimCoreyWebApi.HealthChecks;
+using TodoApi.StartupConfig;
 
 // https://github.com/Xabaril/AspNetCore.Diagnostics.HealthChecks
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+//builder.Services.AddControllers();
+//builder.Services.AddEndpointsApiExplorer();
+//builder.Services.AddSwaggerGen();
 
-#region Authen-Author
+//#region Authen-Author
 
-builder.Services.AddAuthorization(opts =>
-{
-    opts.FallbackPolicy = new AuthorizationPolicyBuilder()
-        .RequireAuthenticatedUser()
-        .Build();
-});
+//builder.Services.AddAuthorization(opts =>
+//{
+//    opts.FallbackPolicy = new AuthorizationPolicyBuilder()
+//        .RequireAuthenticatedUser()
+//        .Build();
+//});
 
-builder.Services.AddAuthentication("Bearer")
-    .AddJwtBearer(opts =>
-    {
-        opts.TokenValidationParameters = new()
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration.GetValue<string>("Authentication:Issuer"),
-            ValidAudience = builder.Configuration.GetValue<string>("Authentication:Audience"),
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.ASCII.GetBytes(
-                builder.Configuration.GetValue<string>("Authentication:SecretKey")))
-        };
-    });
+//builder.Services.AddAuthentication("Bearer")
+//    .AddJwtBearer(opts =>
+//    {
+//        opts.TokenValidationParameters = new()
+//        {
+//            ValidateIssuer = true,
+//            ValidateAudience = true,
+//            ValidateIssuerSigningKey = true,
+//            ValidIssuer = builder.Configuration.GetValue<string>("Authentication:Issuer"),
+//            ValidAudience = builder.Configuration.GetValue<string>("Authentication:Audience"),
+//            IssuerSigningKey = new SymmetricSecurityKey(
+//                Encoding.ASCII.GetBytes(
+//                builder.Configuration.GetValue<string>("Authentication:SecretKey")))
+//        };
+//    });
 
-#endregion
+//#endregion
 
-#region HealthCheck
+//#region HealthCheck
 
-builder.Services.AddHealthChecks()
-    .AddCheck<RandomHealthCheck>("Site Health Check");
-builder.Services.AddHealthChecks().AddSqlServer(builder.Configuration.GetConnectionString("Default"));
+//builder.Services.AddHealthChecks()
+//    .AddCheck<RandomHealthCheck>("Site Health Check");
+//builder.Services.AddHealthChecks().AddSqlServer(builder.Configuration.GetConnectionString("Default"));
 
-#endregion
+//#endregion
 
+builder.AddStandardServices();
+builder.AddAuthServices();
+builder.AddHealthCheckServices();
+builder.AddCustomServices();
 
-builder.Services.AddHealthChecksUI(opts =>
-{
-    opts.AddHealthCheckEndpoint("api", "/health");
-    opts.SetEvaluationTimeInSeconds(5);
-    opts.SetMinimumSecondsBetweenFailureNotifications(10);
-}).AddInMemoryStorage();
+//builder.Services.AddHealthChecksUI(opts =>
+//{
+//    opts.AddHealthCheckEndpoint("api", "/health");
+//    opts.SetEvaluationTimeInSeconds(5);
+//    opts.SetMinimumSecondsBetweenFailureNotifications(10);
+//}).AddInMemoryStorage();
 
 var app = builder.Build();
 
